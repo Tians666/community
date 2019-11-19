@@ -1,34 +1,80 @@
 package life.majiang.community.controller;
 
-import life.majiang.community.Model.User;
-import life.majiang.community.mapper.UserMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.servlet.http.Cookie;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+import life.majiang.community.util.BrowserUtil;
+import net.sf.json.JSONObject;
+
 
 @Controller
 public class IndexController {
-    @Autowired
-    private UserMapper userMapper;
-    @GetMapping("/")
-    public String index(HttpServletRequest request){
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies){
-            if (cookie.getName().equals("token")){
-                String token = cookie.getValue();
-                User user = userMapper.findByToken(token);
-                if (user !=null){
-                    request.getSession().setAttribute("user",user);
-                }
-                break;
-            }
-        }
-        return "index";
-
-    }
+	
+	@Autowired 
+	private ServletContext servletContext;
+	
+	/**
+	 *# 请求首页  
+	 */
+	@RequestMapping("/")
+	public String  index_1(HttpServletResponse  res,HttpServletRequest req) throws Exception {
+		return "redirect:/login";
+	}
+	
+	/**
+	 *   #请求首页  /index
+	 */
+	@RequestMapping("/index")
+	public String index(HttpServletResponse  res,HttpServletRequest req) throws Exception {
+		return "redirect:/login";
+	}
+	
+	
+	/**
+	 *    /login
+	 *    #后台 用户电脑登陆
+	 */
+	@RequestMapping("/login")
+	public ModelAndView login(HttpServletResponse  res,HttpServletRequest req) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		String UserAgent = req.getHeader("User-Agent");
+		//判断AppleWebKit 和  Firefox    
+		if(BrowserUtil.checkUserAgent(UserAgent)){
+			mav.setViewName("/pc/login/login");
+		}else{
+			mav.setViewName("/common/s_mode");
+		}
+		return mav;
+	}
+	
+	
+	
+	/**
+	 * # 后台主页
+	 */
+	@RequestMapping("/admin/main")
+	public ModelAndView admin_main(HttpServletResponse  res,HttpServletRequest req) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		String UserAgent = req.getHeader("User-Agent");
+		//判断AppleWebKit 和  Firefox    
+		if(BrowserUtil.checkUserAgent(UserAgent)){
+			mav.setViewName("/admin/main");
+		}else{
+			mav.setViewName("/common/s_mode");
+		}
+		return mav;
+	}
+	
+	 
+	
 }
